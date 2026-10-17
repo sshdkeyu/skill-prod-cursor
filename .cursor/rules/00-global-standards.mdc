@@ -1,0 +1,62 @@
+---
+description: Global engineering standards and agent behavior. Applies to every request.
+alwaysApply: true
+---
+
+# 00 · Global Standards
+
+These are the baseline expectations for all work in this repository. Other rules
+(`01`–`05`) extend, never contradict, this file.
+
+This repository is one package. `AGENTS.md` at the workspace root lists every rule, skill, example, and template. Read `AGENTS.md` and every file it names before the first edit in a session. A skill adds a workflow or a stack. It does not override these rules.
+
+## Operating principles
+
+1. **Correctness first, then clarity, then cleverness.** Never trade correctness for brevity.
+2. **Evidence over assertion.** Back claims with code references, measurements, or docs. If you're inferring, say so.
+3. **Smallest reversible step.** Prefer changes that are easy to review and easy to roll back. Call out blast radius for anything risky.
+4. **No silent scope creep.** Do exactly what was asked. Propose adjacent improvements separately rather than bundling them.
+5. **Production realism.** Assume real traffic, real money, real on-call. Code that "works locally" is not done.
+
+## Definition of Done
+
+A change is done only when:
+
+- [ ] It compiles/builds and passes existing tests.
+- [ ] New behavior has tests (happy path + at least one failure/edge case).
+- [ ] Errors are handled explicitly; no swallowed exceptions.
+- [ ] Inputs from outside the trust boundary are validated.
+- [ ] No secrets, tokens, or PII are committed or logged.
+- [ ] Public behavior changes are documented (README/CHANGELOG/docstring).
+- [ ] Linters/formatters pass; no new warnings introduced.
+
+## Communication style
+
+- Lead with the answer or the recommendation, then the reasoning.
+- Use checklists and tables for anything with more than three parts.
+- Rank findings by severity: **Critical → High → Medium → Low → Nit.**
+- When uncertain, state the assumption and the confidence level, then proceed.
+- Never fabricate file paths, APIs, config keys, or command output.
+
+## Working with the codebase
+
+- Match existing conventions (style, structure, naming) before introducing new ones.
+- Read before you write: inspect neighboring files to learn the local patterns.
+- Prefer extending existing abstractions over adding parallel ones.
+- Leave the code better than you found it, but keep refactors separate from features.
+
+## When to stop and ask
+
+Stop and ask the human before:
+
+- Destructive or irreversible actions (data deletion, force-push, schema drops).
+- Changing a public API contract or a security boundary.
+- Adding a new heavyweight dependency or service.
+- Anything that materially changes cost, latency, or availability.
+
+## Anti-patterns to avoid
+
+- Cargo-culting patterns without understanding them.
+- "TODO: fix later" left in shipped code without a tracked issue.
+- Broad `try/except` that hides root causes.
+- Comments that narrate the code instead of explaining intent.

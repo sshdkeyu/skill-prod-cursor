@@ -1,0 +1,66 @@
+---
+description: Architecture standards — boundaries, coupling, contracts, idempotency, observability.
+alwaysApply: true
+---
+
+# 04 · Architecture
+
+Optimize for change. The best architecture is the one that's cheapest to evolve safely.
+
+## Boundaries & coupling
+
+- Separate concerns into clear layers (transport ↔ domain ↔ persistence). Don't leak DB models into HTTP handlers.
+- Depend on abstractions, not concretions; inject dependencies (no hidden globals/singletons).
+- Keep the domain core free of framework and I/O details (ports & adapters / hexagonal).
+- High cohesion within a module, loose coupling between modules.
+
+## API & service contracts
+
+- Treat APIs as contracts: explicit schemas, versioning, and backward-compatibility rules.
+- Validate at the boundary; return typed, documented errors.
+- Make breaking changes additive when possible; deprecate before removing.
+- Define and document SLAs/SLOs for latency and availability.
+
+## Reliability patterns
+
+- **Idempotency:** writes triggered by retries/at-least-once delivery must be safe to repeat (idempotency keys).
+- **Timeouts everywhere:** no unbounded waits on dependencies.
+- **Retries with backoff + jitter**, capped, and only for transient/idempotent operations.
+- **Circuit breakers / bulkheads** to contain failures and prevent cascades.
+- **Graceful degradation:** define what the system does when a dependency is down.
+- Design for failure: assume any remote call can fail, be slow, or duplicate.
+
+## State & data
+
+- Single source of truth per piece of data; avoid dual writes without an outbox/saga.
+- Make schema changes backward/forward compatible (expand → migrate → contract).
+- Prefer events for cross-service communication over synchronous chains where coupling hurts.
+- Be explicit about consistency model (strong vs eventual) per use case.
+
+## Observability (non-negotiable in production)
+
+- **Structured logs** with correlation/trace IDs; log decisions and errors, not noise.
+- **Metrics:** RED (Rate, Errors, Duration) for services; USE for resources.
+- **Traces** across service boundaries for latency attribution.
+- Define alerts on symptoms (SLO burn) rather than every cause.
+- Health/readiness endpoints distinct and meaningful.
+
+## Configuration & deployment
+
+- Configuration via environment, not code; never branch on hardcoded hostnames.
+- Feature-flag risky changes; support safe rollout and instant rollback.
+- Keep deployments boring: small, frequent, reversible.
+
+## Decision hygiene
+
+- Record significant decisions as ADRs (see `.cursor/templates/architecture-doc-template.md`).
+- State the trade-offs and the rejected alternatives, not just the choice.
+
+## Architecture checklist
+
+- [ ] Clear separation of concerns; domain isolated from I/O.
+- [ ] External calls: timeout + retry + failure behavior defined.
+- [ ] Writes are idempotent where retries are possible.
+- [ ] Schema changes are backward compatible.
+- [ ] Logs/metrics/traces emitted with correlation IDs.
+- [ ] Significant decisions captured in an ADR.

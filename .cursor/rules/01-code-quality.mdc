@@ -1,0 +1,66 @@
+---
+description: Code quality standards — readability, naming, testing, error handling, dependencies.
+alwaysApply: true
+---
+
+# 01 · Code Quality
+
+Write code for the next engineer who has to maintain it at 3 a.m. during an incident.
+
+## Readability & structure
+
+- Functions do one thing. If you need "and" to describe it, split it.
+- Keep functions short; extract when nesting exceeds ~3 levels.
+- Extract duplication on the third copy. A second copy is not yet a pattern.
+- Prefer early returns (guard clauses) over deep `if/else` pyramids.
+- No dead code, commented-out blocks, or unused imports/vars.
+- Keep modules cohesive: things that change together live together.
+
+## Naming
+
+- Names reveal intent: `maxRetries`, not `mr`; `isEligible`, not `flag`.
+- Booleans read as predicates: `hasAccess`, `isExpired`, `shouldRetry`.
+- Avoid abbreviations except universally understood ones (`id`, `url`, `db`).
+- Functions are verbs (`fetchUser`); collections are plural (`users`).
+
+## Comments & docs
+
+- Comment **why**, not **what**. The code already says what.
+- Document non-obvious trade-offs, invariants, and gotchas.
+- Public functions/classes get a docstring: purpose, params, returns, raises.
+- Delete comments that restate the line below them.
+
+## Error handling
+
+- Fail fast and loudly at boundaries; degrade gracefully in the hot path.
+- Catch the narrowest exception you can handle; never bare `except`/`catch(e){}`.
+- Always include context in errors: what failed, with what inputs.
+- Don't use exceptions for normal control flow.
+- Clean up resources deterministically (`with`, `defer`, `try/finally`, RAII).
+
+## Testing
+
+- Every bug fix gets a regression test that fails before the fix.
+- Test behavior, not implementation; avoid asserting on private internals.
+- Cover the unhappy paths: nulls, empties, timeouts, duplicates, boundaries.
+- Tests are deterministic: no real network, no `sleep`-based timing, no shared state.
+- Name tests by scenario: `returns_403_when_token_expired`.
+
+## Types & contracts
+
+- Use the strongest typing the language offers; avoid `any`/`interface{}`/`Object`.
+- Make illegal states unrepresentable (enums, sum types, value objects).
+- Validate and parse at the edge; keep the core working on trusted types.
+
+## Dependencies
+
+- Prefer the standard library; add a dependency only when it earns its keep.
+- Pin versions; review transitive footprint and license before adding.
+- Wrap volatile third-party APIs behind a thin internal interface.
+
+## Quality gates (must pass)
+
+- [ ] Formatter and linter clean.
+- [ ] No new compiler/type warnings.
+- [ ] Cyclomatic complexity of new functions stays reasonable.
+- [ ] Public API changes have tests and docs.

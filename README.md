@@ -1,49 +1,95 @@
+<div align="center">
+
 # Production skills for Cursor
 
-One package of rules and skills for production software. Install it into an app repo. On the next edit, Cursor reads `AGENTS.md` and every file that index names, then applies them. You do not paste the rules into the chat.
+**The agent writes code the way someone on call would accept it.**
 
-[Styled page](./index.html) · [MIT](./LICENSE)
+Install the package into the app repo. On the next edit, Cursor reads `AGENTS.md` and every file that index names, then applies them. You do not paste a prompt.
 
-## What this is
+[![License: MIT](https://img.shields.io/badge/license-MIT-1c1915?style=flat-square)](./LICENSE)
+[![Made for Cursor](https://img.shields.io/badge/runs%20in-Cursor-1c1915?style=flat-square)](https://cursor.com)
+[![Laid-out page](https://img.shields.io/badge/layout-bad%20%2F%20good-1f6b45?style=flat-square)](./index.html)
 
-| Piece | Job |
-| --- | --- |
-| Rules `00`–`05` | The floor: done-ness, quality, security, performance, architecture, AWS. These win if a skill disagrees. |
-| Skills | A workflow or a stack: Solid, Go, JavaScript, data access, API design, review, refactor, incidents. |
-| Examples | Bad code, why it costs you in production, and the replacement. |
-| Templates | PR review, architecture decision, incident report. |
+</div>
 
-`skills/production` is the door. If `AGENTS.md` is missing, the agent stops and names the missing file.
+## Install
 
-## Domain
+The terminal asks what to copy. The default answer is no, so a file lands only when you say yes. Each rule you accept then asks how Cursor should apply it: always, intelligently, on a file glob, or only when you @-mention it.
 
-Day-to-day development of software that already has users: writing a feature, fixing a bug, reviewing a diff, shaping an HTTP contract, touching Go or JavaScript, loading a list that joins another table, or triaging a live incident.
+```bash
+curl -fsSL https://sshdkeyu.github.io/skill-prod-cursor/i | bash
+```
+
+From a clone, run this inside the app repo:
+
+```bash
+bash /path/to/skill-prod-cursor/install.sh
+```
+
+## Who it is for
+
+Teams shipping software that already has users. A feature, a bugfix, a diff, an HTTP contract, Go, JavaScript, a list that joins another table, or a live incident.
 
 ## What you get
 
-- The agent follows one written floor instead of inventing a style per chat.
-- Install asks first. The default answer is no, so a file is copied only when you say yes.
-- Each selected rule asks how Cursor should apply it: always, intelligently, a file glob, or only when you @-mention it.
-- Go cases stay in Go. JavaScript cases stay in JavaScript. A query-per-row applies in every language.
-- Rules stay short. The long bad/good cases live in `references/` and `examples/`.
+<table>
+<tr>
+<td width="33%" valign="top">
 
-## Two ways the cases are written
+### One floor
 
-Horizontal: bad and good sit side by side. Vertical: bad, the cost, then good, stacked. The [styled page](./index.html) draws both. The files Cursor reads stay plain Markdown so the agent can execute them.
+Quality, security, performance, architecture, and AWS sit in rules `00`–`05`. When a skill disagrees with a rule, the rule wins.
 
-### Horizontal
+</td>
+<td width="33%" valign="top">
 
-| Bad | Good |
-| --- | --- |
-| `preprocessed, _ := preprocess(raw)` throws the error away. A truncated payload becomes an empty success. | `preprocessed, err := preprocess(raw)` then return `fmt.Errorf("preprocess message: %w", err)` before using the value. |
+### One skill per job
 
-### Vertical
+Solid for application code. Go and JavaScript stay in their own files. Data access, API design, review, refactor, and incidents each have a playbook.
 
-**Bad.** Load every post, then read `post.getAuthor()` inside the loop. That is one `SELECT` for the posts plus one `SELECT` per post.
+</td>
+<td width="33%" valign="top">
 
-**Cost.** Five posts feels fine. Fifty posts is 51 round trips. No single statement looks slow, and the endpoint's p99 moves.
+### A case, not a slogan
 
-**Good.** One join when each post has one author:
+Long guidance is bad code, the production cost, and the replacement. The agent copies that shape on the next edit.
+
+</td>
+</tr>
+</table>
+
+## Side by side
+
+<table>
+<tr>
+<td width="50%" valign="top">
+
+**Bad.** The error is discarded. A truncated payload becomes an empty success.
+
+<pre><code>preprocessed, _ := preprocess(raw)
+token, err := parseLine(preprocessed[0])</code></pre>
+
+</td>
+<td width="50%" valign="top">
+
+**Good.** The error is checked before the value is used. `%w` keeps the cause for the caller.
+
+<pre><code>preprocessed, err := preprocess(raw)
+if err != nil {
+    return Message{}, fmt.Errorf("preprocess message: %w", err)
+}</code></pre>
+
+</td>
+</tr>
+</table>
+
+## Stacked: bad, cost, good
+
+**Bad.** Load the posts, then read each author inside the loop. That is one query, plus one query per post.
+
+**Cost.** Five posts still feels fine. Fifty posts is 51 round trips. No single statement looks slow, and the endpoint's tail latency moves.
+
+**Good.** One join when each post has one author. Name the columns. Bind the ids.
 
 ```sql
 SELECT p.id, p.title, a.name
@@ -51,23 +97,16 @@ FROM posts AS p
 JOIN authors AS a ON a.id = p.author_id;
 ```
 
-Name the columns. Bind the ids. Do not `SELECT *` on this path.
+The same two layouts, with color, are on the [laid-out page](./index.html). The files Cursor reads stay plain Markdown so it can execute them.
 
-## Install
+## Why it holds
 
-The questions appear in the terminal. The default is no.
+- The same floor in every chat, in every repo where you install it.
+- Go cases stay in Go. JavaScript cases stay in JavaScript. A query per row applies in every language.
+- If `AGENTS.md` is missing, the agent stops and names that file.
+- `skills/production` is the door. It sends the agent through the index before the first edit.
 
-```bash
-curl -fsSL https://sshdkeyu.github.io/skill-prod-cursor/i | bash
-```
-
-From a clone, in the app repo:
-
-```bash
-bash /path/to/skill-prod-cursor/install.sh
-```
-
-## What the agent runs
+## What Cursor runs
 
 | You are doing | It follows |
 | --- | --- |

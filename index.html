@@ -7,40 +7,47 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
+  <header class="hero">
+    <div class="hero-inner">
+      <p class="kicker">Cursor · production software</p>
+      <h1>The agent writes code the way someone on call would accept it.</h1>
+      <p class="lede">Install once. The next edit reads <code>AGENTS.md</code> and the files it names, then applies them. You do not paste a prompt.</p>
+      <pre class="install">curl -fsSL https://sshdkeyu.github.io/skill-prod-cursor/i | bash</pre>
+      <p class="fine">The terminal asks first. The default answer is no.</p>
+    </div>
+  </header>
+
   <main>
-    <h1>Production skills for Cursor</h1>
-    <p class="lede">Rules and skills for production software. Install the package once. On the next edit, Cursor reads <code>AGENTS.md</code> and the files it names, then applies them.</p>
-    <p class="muted">You do not paste the rules into the chat. The agent executes the files.</p>
-
-    <h2>What it is</h2>
-    <table class="facts">
-      <tr><th>Rules 00–05</th><td>The floor: done-ness, quality, security, performance, architecture, AWS. These win if a skill disagrees.</td></tr>
-      <tr><th>Skills</th><td>A workflow or a stack: Solid, Go, JavaScript, data access, API design, review, refactor, incidents.</td></tr>
-      <tr><th>Examples</th><td>Bad code, the production cost, and the replacement.</td></tr>
-      <tr><th>Door</th><td><code>skills/production</code> sends the agent to <code>AGENTS.md</code>. If that file is missing, it stops.</td></tr>
-    </table>
-
-    <h2>Domain</h2>
-    <p>Writing a feature, fixing a bug, reviewing a diff, shaping an HTTP contract, touching Go or JavaScript, loading a list that joins another table, or triaging a live incident.</p>
+    <h2>Who it is for</h2>
+    <p>Teams shipping software that already has users. A feature, a bugfix, a diff, an HTTP contract, Go, JavaScript, a list that joins another table, or a live incident.</p>
 
     <h2>What you get</h2>
-    <ul>
-      <li>One written floor, instead of a new style every chat.</li>
-      <li>Install asks first. The default answer is no.</li>
-      <li>Each rule can apply always, intelligently, to a file glob, or only when you @-mention it.</li>
-      <li>Go cases stay in Go. JavaScript cases stay in JavaScript. A query per row applies in every language.</li>
+    <ul class="cards">
+      <li>
+        <h3>One floor</h3>
+        <p>Quality, security, performance, architecture, and AWS sit in rules 00–05. When a skill disagrees, the rule wins.</p>
+      </li>
+      <li>
+        <h3>One skill per job</h3>
+        <p>Solid for application code. Go and JavaScript stay apart. Data access, APIs, review, refactor, and incidents each have a playbook.</p>
+      </li>
+      <li>
+        <h3>A case, not a slogan</h3>
+        <p>Long guidance is bad code, the production cost, and the replacement. The agent copies that shape.</p>
+      </li>
     </ul>
 
-    <h2>Horizontal</h2>
-    <p class="muted">Bad and good in two columns. On a narrow screen they stack.</p>
+    <h2>Side by side</h2>
     <div class="pair horizontal">
       <section class="pane bad">
         <h3>Bad</h3>
+        <p>The error is discarded. A truncated payload becomes an empty success.</p>
         <pre>preprocessed, _ := preprocess(raw)
 token, err := parseLine(preprocessed[0])</pre>
       </section>
       <section class="pane good">
         <h3>Good</h3>
+        <p>The error is checked before the value is used. <code>%w</code> keeps the cause.</p>
         <pre>preprocessed, err := preprocess(raw)
 if err != nil {
     return Message{}, fmt.Errorf(
@@ -48,36 +55,32 @@ if err != nil {
 }</pre>
       </section>
     </div>
-    <p class="note">The discarded error turns a truncated payload into an empty success. Check the error, then use the value. Wrap with <code>%w</code> when the caller needs the cause.</p>
 
-    <h2>Vertical</h2>
-    <p class="muted">Bad, the cost, then good, stacked.</p>
+    <h2>Stacked</h2>
+    <p class="muted">Bad, the cost, then the replacement.</p>
     <div class="pair vertical">
       <section class="pane bad">
         <h3>Bad</h3>
+        <p>Load the posts, then read each author inside the loop.</p>
         <pre>posts = postRepository.findAll()
 for post in posts:
-    author = post.getAuthor()  # one SELECT per post
+    author = post.getAuthor()
     render(post.title, author.name)</pre>
       </section>
       <section class="pane">
         <h3>Cost</h3>
-        <p>Five posts feels fine. Fifty posts is 51 round trips. No single statement looks slow, and the endpoint's p99 moves.</p>
+        <p>Five posts still feels fine. Fifty posts is 51 round trips. No single statement looks slow, and the tail latency moves.</p>
       </section>
       <section class="pane good">
         <h3>Good</h3>
+        <p>One join when each post has one author. Name the columns. Bind the ids.</p>
         <pre>SELECT p.id, p.title, a.name
 FROM posts AS p
 JOIN authors AS a ON a.id = p.author_id;</pre>
       </section>
     </div>
-    <p class="note">Name the columns. Bind the ids. Do not <code>SELECT *</code> on this path.</p>
 
-    <h2>Install</h2>
-    <pre class="install">curl -fsSL https://sshdkeyu.github.io/skill-prod-cursor/i | bash</pre>
-    <p class="note">The questions still appear. Nothing is copied until you say yes.</p>
-
-    <h2>What the agent runs</h2>
+    <h2>What Cursor runs</h2>
     <table class="run">
       <tr><th>Application code</th><td>Rules 01 and 04, then skills/solid</td></tr>
       <tr><th>Go</th><td>skills/go</td></tr>
@@ -89,6 +92,8 @@ JOIN authors AS a ON a.id = p.author_id;</pre>
       <tr><th>A live incident</th><td>skills/debug-production-incident</td></tr>
       <tr><th>IAM, networking, AWS</th><td>Rule 05</td></tr>
     </table>
+    <p class="note">If <code>AGENTS.md</code> is missing, the agent stops and names that file.</p>
   </main>
+  <footer>MIT · z, ...</footer>
 </body>
 </html>

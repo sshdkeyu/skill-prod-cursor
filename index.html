@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Production skills for Cursor</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main>
+    <h1>Production skills for Cursor</h1>
+    <p class="lede">Rules and skills for production software. Install the package once. On the next edit, Cursor reads <code>AGENTS.md</code> and the files it names, then applies them.</p>
+    <p class="muted">You do not paste the rules into the chat. The agent executes the files.</p>
+
+    <h2>What it is</h2>
+    <table class="facts">
+      <tr><th>Rules 00–05</th><td>The floor: done-ness, quality, security, performance, architecture, AWS. These win if a skill disagrees.</td></tr>
+      <tr><th>Skills</th><td>A workflow or a stack: Solid, Go, JavaScript, data access, API design, review, refactor, incidents.</td></tr>
+      <tr><th>Examples</th><td>Bad code, the production cost, and the replacement.</td></tr>
+      <tr><th>Door</th><td><code>skills/production</code> sends the agent to <code>AGENTS.md</code>. If that file is missing, it stops.</td></tr>
+    </table>
+
+    <h2>Domain</h2>
+    <p>Writing a feature, fixing a bug, reviewing a diff, shaping an HTTP contract, touching Go or JavaScript, loading a list that joins another table, or triaging a live incident.</p>
+
+    <h2>What you get</h2>
+    <ul>
+      <li>One written floor, instead of a new style every chat.</li>
+      <li>Install asks first. The default answer is no.</li>
+      <li>Each rule can apply always, intelligently, to a file glob, or only when you @-mention it.</li>
+      <li>Go cases stay in Go. JavaScript cases stay in JavaScript. A query per row applies in every language.</li>
+    </ul>
+
+    <h2>Horizontal</h2>
+    <p class="muted">Bad and good in two columns. On a narrow screen they stack.</p>
+    <div class="pair horizontal">
+      <section class="pane bad">
+        <h3>Bad</h3>
+        <pre>preprocessed, _ := preprocess(raw)
+token, err := parseLine(preprocessed[0])</pre>
+      </section>
+      <section class="pane good">
+        <h3>Good</h3>
+        <pre>preprocessed, err := preprocess(raw)
+if err != nil {
+    return Message{}, fmt.Errorf(
+        "preprocess message: %w", err)
+}</pre>
+      </section>
+    </div>
+    <p class="note">The discarded error turns a truncated payload into an empty success. Check the error, then use the value. Wrap with <code>%w</code> when the caller needs the cause.</p>
+
+    <h2>Vertical</h2>
+    <p class="muted">Bad, the cost, then good, stacked.</p>
+    <div class="pair vertical">
+      <section class="pane bad">
+        <h3>Bad</h3>
+        <pre>posts = postRepository.findAll()
+for post in posts:
+    author = post.getAuthor()  # one SELECT per post
+    render(post.title, author.name)</pre>
+      </section>
+      <section class="pane">
+        <h3>Cost</h3>
+        <p>Five posts feels fine. Fifty posts is 51 round trips. No single statement looks slow, and the endpoint's p99 moves.</p>
+      </section>
+      <section class="pane good">
+        <h3>Good</h3>
+        <pre>SELECT p.id, p.title, a.name
+FROM posts AS p
+JOIN authors AS a ON a.id = p.author_id;</pre>
+      </section>
+    </div>
+    <p class="note">Name the columns. Bind the ids. Do not <code>SELECT *</code> on this path.</p>
+
+    <h2>Install</h2>
+    <pre class="install">curl -fsSL https://sshdkeyu.github.io/skill-prod-cursor/i | bash</pre>
+    <p class="note">The questions still appear. Nothing is copied until you say yes.</p>
+
+    <h2>What the agent runs</h2>
+    <table class="run">
+      <tr><th>Application code</th><td>Rules 01 and 04, then skills/solid</td></tr>
+      <tr><th>Go</th><td>skills/go</td></tr>
+      <tr><th>JavaScript or TypeScript</th><td>skills/javascript</td></tr>
+      <tr><th>A query per row</th><td>skills/data-access and rule 03</td></tr>
+      <tr><th>An HTTP contract</th><td>skills/api-design-assistant</td></tr>
+      <tr><th>A diff or a PR</th><td>skills/code-review-expert</td></tr>
+      <tr><th>A large move across callers</th><td>skills/refactor-large-codebase</td></tr>
+      <tr><th>A live incident</th><td>skills/debug-production-incident</td></tr>
+      <tr><th>IAM, networking, AWS</th><td>Rule 05</td></tr>
+    </table>
+  </main>
+</body>
+</html>

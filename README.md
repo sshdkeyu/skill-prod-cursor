@@ -1,162 +1,85 @@
-# Cursor Production Skills
+# Production skills for Cursor
 
-> A curated, production-grade collection of Cursor **rules**, **skills**, **templates**, and **worked examples** for developers shipping software — writing code, reviewing diffs, designing APIs, refactoring safely, and debugging production incidents.
+One package of rules and skills for production software. Install it into an app repo. On the next edit, Cursor reads `AGENTS.md` and every file that index names, then applies them. You do not paste the rules into the chat.
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
-[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](#contributing)
-[![Cursor](https://img.shields.io/badge/Made%20for-Cursor-000000.svg)](https://cursor.com)
+[Styled page](./index.html) · [MIT](./LICENSE)
 
-This repo turns an AI coding assistant into a disciplined senior engineer. Drop it into any project and Cursor will follow consistent standards for quality, security, performance, architecture, and cloud cost — and it ships reusable "skills" for the highest-leverage engineering workflows.
+## What this is
 
----
+| Piece | Job |
+| --- | --- |
+| Rules `00`–`05` | The floor: done-ness, quality, security, performance, architecture, AWS. These win if a skill disagrees. |
+| Skills | A workflow or a stack: Solid, Go, JavaScript, data access, API design, review, refactor, incidents. |
+| Examples | Bad code, why it costs you in production, and the replacement. |
+| Templates | PR review, architecture decision, incident report. |
 
-## Why this exists
+`skills/production` is the door. If `AGENTS.md` is missing, the agent stops and names the missing file.
 
-Most AI-assisted coding fails the same way: inconsistent standards, security blind spots, "works on my machine" performance, and architecture decisions made implicitly. This repo encodes the judgment of a staff-level engineer into version-controlled, reviewable artifacts so every interaction is grounded in the same expectations.
+## Domain
 
-- **Rules** — always-on guardrails Cursor applies to every edit.
-- **Skills** — invokable playbooks for specific high-stakes workflows.
-- **Templates** — fill-in-the-blank docs for PRs, architecture, and incidents.
-- **Examples** — concrete before/after references the model can learn from.
+Day-to-day development of software that already has users: writing a feature, fixing a bug, reviewing a diff, shaping an HTTP contract, touching Go or JavaScript, loading a list that joins another table, or triaging a live incident.
 
----
+## What you get
 
-## Repository layout
+- The agent follows one written floor instead of inventing a style per chat.
+- Install asks first. The default answer is no, so a file is copied only when you say yes.
+- Each selected rule asks how Cursor should apply it: always, intelligently, a file glob, or only when you @-mention it.
+- Go cases stay in Go. JavaScript cases stay in JavaScript. A query-per-row applies in every language.
+- Rules stay short. The long bad/good cases live in `references/` and `examples/`.
 
-```text
-cursor-production-skills/
-├── AGENTS.md                          # Read-this-first index for the agent
-├── README.md
-├── LICENSE
-├── skills/
-│   ├── production/                    # Door: tells the agent to read AGENTS.md
-│   ├── debug-production-incident/
-│   │   ├── SKILL.md
-│   │   └── README.md
-│   ├── api-design-assistant/
-│   ├── refactor-large-codebase/
-│   ├── code-review-expert/
-│   ├── solid/
-│   │   ├── SKILL.md
-│   │   └── references/
-│   ├── go/
-│   │   ├── SKILL.md
-│   │   └── references/bad-vs-good.md
-│   ├── javascript/
-│   │   ├── SKILL.md
-│   │   └── references/bad-vs-good.md
-│   └── data-access/
-│       ├── SKILL.md
-│       └── references/bad-vs-good.md
-├── .cursor/
-│   ├── rules/                         # Always-on engineering standards (.mdc)
-│   │   ├── 00-global-standards.mdc
-│   │   ├── 01-code-quality.mdc
-│   │   ├── 02-security.mdc
-│   │   ├── 03-performance.mdc
-│   │   ├── 04-architecture.mdc
-│   │   └── 05-cloud-aws.mdc
-│   └── templates/                     # Reusable document scaffolds
-│       ├── pr-review-template.md
-│       ├── architecture-doc-template.md
-│       └── incident-report-template.md
-└── examples/                          # Worked, opinionated examples
-    ├── bad-vs-good-api-design.md
-    └── scaling-example.md
+## Two ways the cases are written
+
+Horizontal: bad and good sit side by side. Vertical: bad, the cost, then good, stacked. The [styled page](./index.html) draws both. The files Cursor reads stay plain Markdown so the agent can execute them.
+
+### Horizontal
+
+| Bad | Good |
+| --- | --- |
+| `preprocessed, _ := preprocess(raw)` throws the error away. A truncated payload becomes an empty success. | `preprocessed, err := preprocess(raw)` then return `fmt.Errorf("preprocess message: %w", err)` before using the value. |
+
+### Vertical
+
+**Bad.** Load every post, then read `post.getAuthor()` inside the loop. That is one `SELECT` for the posts plus one `SELECT` per post.
+
+**Cost.** Five posts feels fine. Fifty posts is 51 round trips. No single statement looks slow, and the endpoint's p99 moves.
+
+**Good.** One join when each post has one author:
+
+```sql
+SELECT p.id, p.title, a.name
+FROM posts AS p
+JOIN authors AS a ON a.id = p.author_id;
 ```
 
-> **Choose what you install.** `install.sh` asks in the terminal. The default answer is no, so a component is copied only when you say yes. Selected rules then ask how they apply: always, intelligently, by glob, or only when @-mentioned.
+Name the columns. Bind the ids. Do not `SELECT *` on this path.
 
----
+## Install
 
-## Quick start
-
-From a clone, in the app repo's parent or after `cd` to the app:
-
-```bash
-bash /path/to/cursor-production-skills/install.sh
-```
-
-From any machine:
+The questions appear in the terminal. The default is no.
 
 ```bash
 curl -fsSL https://sshdkeyu.github.io/skill-prod-cursor/i | bash
 ```
 
-The questions still appear. The script reads them from the terminal, not from the pipe. Copying the whole tree by hand is the same set of files, without the questions:
+From a clone, in the app repo:
 
 ```bash
-cp AGENTS.md /path/to/app/AGENTS.md
-cp -R skills /path/to/app/skills
-cp -R examples /path/to/app/examples
-cp -R .cursor/rules /path/to/app/.cursor/rules
-cp -R .cursor/templates /path/to/app/.cursor/templates
+bash /path/to/skill-prod-cursor/install.sh
 ```
 
----
+## What the agent runs
 
-## What's inside
-
-### Rules (always-on)
-
-| File | Enforces |
+| You are doing | It follows |
 | --- | --- |
-| `00-global-standards.mdc` | Communication style, definition of done, how the agent should behave |
-| `01-code-quality.mdc` | Readability, naming, testing, error handling, dependency hygiene |
-| `02-security.mdc` | Input validation, authN/Z, secrets, OWASP Top 10, supply chain |
-| `03-performance.mdc` | Big-O awareness, N+1 queries, caching, memory, profiling-first |
-| `04-architecture.mdc` | Boundaries, coupling, API contracts, idempotency, observability |
-| `05-cloud-aws.mdc` | Least privilege IAM, networking, resilience, tagging, cost-aware infra |
-
-### Skills (one package, read via `AGENTS.md`)
-
-| Skill | Use it when… |
-| --- | --- |
-| `production` | The package door. Reads `AGENTS.md` and every file it lists before editing |
-| `debug-production-incident` | A live system is degraded and you need a structured triage → mitigation → RCA flow |
-| `api-design-assistant` | You're designing or reviewing a REST/RPC API contract |
-| `refactor-large-codebase` | You need to safely change code at scale without breaking behavior |
-| `code-review-expert` | You want a rigorous, severity-ranked review of a diff or PR |
-| `solid` | You're implementing a feature, fixing a bug, or reshaping application code |
-| `go` | You're writing or reviewing Go (errors, goroutines, parsers, byte payloads) |
-| `javascript` | You're writing or reviewing JavaScript or TypeScript |
-| `data-access` | A list loads a relation per row, or an endpoint is fast at 5 rows and slow at 50 |
-
-### Templates
-
-`pr-review-template.md`, `architecture-doc-template.md`, and `incident-report-template.md` give you consistent, complete documents every time.
-
-### Examples
-
-`bad-vs-good-api-design.md` and `scaling-example.md` are concrete references the model (and your team) can anchor on.
-
----
-
-## Design principles
-
-- **Evidence over assertion.** Decisions cite measurements, not vibes.
-- **Severity-ranked output.** Findings are ordered by impact so humans act on what matters.
-- **Reversibility & safety.** Prefer small, reversible steps; call out blast radius.
-- **Production realism.** Everything assumes real traffic, real money, and real on-call.
-
----
-
-## Compatibility
-
-Built for [Cursor](https://cursor.com). The Markdown rules/skills are model-agnostic and are useful as context for other AI coding tools (Claude Code, Copilot, etc.) with minor path adjustments.
-
----
-
-## Contributing
-
-Contributions are welcome. Please:
-
-1. Keep each rule/skill focused and self-contained.
-2. Favor checklists and concrete heuristics over prose.
-3. Include a worked example when adding a skill.
-4. Open a PR using `.cursor/templates/pr-review-template.md`.
-
----
+| Application code | Rules `01` and `04`, then `skills/solid` |
+| Go | `skills/go` |
+| JavaScript or TypeScript | `skills/javascript` |
+| A query per row, an ORM, a list endpoint | `skills/data-access` and rule `03` |
+| An HTTP contract | `skills/api-design-assistant` |
+| A diff or a PR | `skills/code-review-expert` |
+| A large move across callers | `skills/refactor-large-codebase` |
+| A live incident | `skills/debug-production-incident` |
+| IAM, networking, AWS | Rule `05` |
 
 ## License
 
